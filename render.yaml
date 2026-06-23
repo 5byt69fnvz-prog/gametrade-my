@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: gametrade-my-preview
+    name: gametrade-my
     runtime: node
     region: singapore
     # Free preview plan: spins down when idle. Upgrade to starter for production.
@@ -26,7 +26,7 @@ services:
       - key: CRON_SECRET
         generateValue: true
       - key: APP_URL
-        value: https://gametrade-my-preview.onrender.com
+        value: https://gametrade-my.onrender.com
       - key: INITIAL_ADMIN_NAME
         value: GameTrade MY Admin
       - key: INITIAL_ADMIN_EMAIL
