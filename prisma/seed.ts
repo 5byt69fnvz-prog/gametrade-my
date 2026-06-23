@@ -280,6 +280,7 @@ async function main() {
   const password = process.env.INITIAL_ADMIN_PASSWORD;
   if (email && password) {
     const phoneNormalized = phone ? normalizeMalaysianPhone(phone) : null;
+    const passwordHash = await hashPassword(password);
     await prisma.user.upsert({
       where: { emailNormalized: normalizeEmail(email) },
       create: {
@@ -289,12 +290,12 @@ async function main() {
         emailNormalized: normalizeEmail(email),
         phone: phone || null,
         phoneNormalized,
-        passwordHash: await hashPassword(password),
+        passwordHash,
         emailVerified: true,
         phoneVerified: false,
         primaryVerification: "EMAIL"
       },
-      update: { role: UserRole.ADMIN, emailVerified: true, primaryVerification: "EMAIL" }
+      update: { role: UserRole.ADMIN, passwordHash, emailVerified: true, primaryVerification: "EMAIL" }
     });
   }
 
