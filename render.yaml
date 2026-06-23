@@ -3,7 +3,8 @@ services:
     name: gametrade-my
     runtime: node
     region: singapore
-    plan: starter
+    # Free preview plan: spins down when idle. Upgrade to starter for production.
+    plan: free
     buildCommand: npm ci && npm run build
     preDeployCommand: npm run db:migrate && npm run db:seed
     startCommand: npm start
@@ -61,4 +62,5 @@ databases:
     databaseName: gametrade
     user: gametrade
     region: singapore
-    plan: basic-256mb
+    # Free preview database expires after 30 days. Upgrade to basic-256mb for production.
+    plan: free
