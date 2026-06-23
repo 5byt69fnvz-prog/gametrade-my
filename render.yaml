@@ -13,6 +13,8 @@ services:
         value: 20.19.0
       - key: NODE_ENV
         value: production
+      - key: DEMO_MODE
+        value: "true"
       - key: DATABASE_URL
         fromDatabase:
           name: gametrade-my-db
@@ -24,37 +26,37 @@ services:
       - key: CRON_SECRET
         generateValue: true
       - key: APP_URL
-        sync: false
+        value: https://gametrade-my.onrender.com
       - key: INITIAL_ADMIN_NAME
-        sync: false
+        value: GameTrade MY Admin
       - key: INITIAL_ADMIN_EMAIL
-        sync: false
+        value: admin@gametrade.my
       - key: INITIAL_ADMIN_PHONE
-        sync: false
+        value: "+60123456789"
       - key: INITIAL_ADMIN_PASSWORD
         sync: false
       - key: RESEND_API_KEY
-        sync: false
+        value: preview-no-resend
       - key: EMAIL_FROM
-        sync: false
+        value: GameTrade MY <verify@example.com>
       - key: S3_ENDPOINT
-        sync: false
+        value: https://example.invalid
       - key: S3_REGION
         value: auto
       - key: S3_BUCKET
-        sync: false
+        value: gametrade-preview
       - key: S3_ACCESS_KEY_ID
-        sync: false
+        value: preview
       - key: S3_SECRET_ACCESS_KEY
-        sync: false
+        value: preview
       - key: S3_PUBLIC_BASE_URL
-        sync: false
+        value: https://example.invalid
       - key: PAYMENT_BANK_NAME
-        sync: false
+        value: GameTrade MY Demo Collection
       - key: PAYMENT_BANK_ACCOUNT
-        sync: false
+        value: Maybank 5622 1188 7091
       - key: PAYMENT_DUITNOW_ID
-        sync: false
+        value: gametrade.my@example.com
 
 databases:
   - name: gametrade-my-db

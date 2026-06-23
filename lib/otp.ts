@@ -7,6 +7,7 @@ const TEN_MINUTES = 10 * 60 * 1000;
 const ONE_MINUTE = 60 * 1000;
 
 async function sendEmailOtp(destination: string, code: string) {
+  if (process.env.DEMO_MODE === "true") return `demo-${code}`;
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.EMAIL_FROM;
   if (!apiKey || !from) throw new Error("Email provider is not configured");
@@ -55,7 +56,7 @@ export async function sendOtp(user: User, channel: OtpChannel, purpose: OtpPurpo
     });
     throw error;
   }
-  return challenge.id;
+  return { id: challenge.id, demoCode: process.env.DEMO_MODE === "true" ? code : undefined };
 }
 
 export async function verifyOtp(userId: string, channel: OtpChannel, purpose: OtpPurpose, code: string) {

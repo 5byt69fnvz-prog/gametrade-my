@@ -14,8 +14,8 @@ export async function POST(request: NextRequest) {
     const input = await parseJson(request, otpSendSchema);
     const limit = await consumeRateLimit(`otp-send:${user.id}:${input.channel}`, 8, 3600);
     if (!limit.allowed) throw new Error("RATE_LIMITED");
-    await sendOtp(user, OtpChannel[input.channel], OtpPurpose[input.purpose]);
-    return jsonOk({ sent: true, channel: input.channel });
+    const result = await sendOtp(user, OtpChannel[input.channel], OtpPurpose[input.purpose]);
+    return jsonOk({ sent: true, channel: input.channel, demoCode: result.demoCode });
   } catch (error) {
     return apiError(error);
   }

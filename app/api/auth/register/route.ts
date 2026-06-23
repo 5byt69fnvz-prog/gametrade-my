@@ -34,7 +34,10 @@ export async function POST(request: NextRequest) {
     await audit({ actorId: user.id, action: "USER_REGISTERED", entityType: "User", entityId: user.id, ipHash: hashNetworkValue(requestIp(request)) });
     return jsonOk({
       user: { id: user.id, name: user.name, emailVerified: false, phoneVerified: false },
-      delivery: { email: delivery[0].status }
+      delivery: {
+        email: delivery[0].status,
+        demoCode: delivery[0].status === "fulfilled" ? delivery[0].value.demoCode : undefined
+      }
     }, { status: 201 });
   } catch (error) {
     if (error instanceof Error && error.message === "VALIDATION_PHONE") return Response.json({ ok: false, error: "Use a valid Malaysian phone number" }, { status: 422 });

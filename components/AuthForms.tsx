@@ -12,7 +12,7 @@ export function AuthForms() {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setBusy(true); setError("");
     const values = Object.fromEntries(new FormData(event.currentTarget));
-    try { await api(tab === "register" ? "/api/auth/register" : "/api/auth/login", { method: "POST", body: JSON.stringify(values) }); router.push(tab === "register" ? "/verify" : "/"); router.refresh(); }
+    try { const result = await api<{ delivery?: { demoCode?: string } }>(tab === "register" ? "/api/auth/register" : "/api/auth/login", { method: "POST", body: JSON.stringify(values) }); if (tab === "register" && result.delivery?.demoCode) sessionStorage.setItem("gametrade-demo-otp", result.delivery.demoCode); router.push(tab === "register" ? "/verify" : "/"); router.refresh(); }
     catch (cause) { setError(cause instanceof Error ? cause.message : "提交失败"); } finally { setBusy(false); }
   }
   return <div className="auth-panel"><div className="auth-tabs"><button type="button" className={tab === "login" ? "active" : ""} onClick={() => setTab("login")}>登录</button><button type="button" className={tab === "register" ? "active" : ""} onClick={() => setTab("register")}>创建账号</button></div>
