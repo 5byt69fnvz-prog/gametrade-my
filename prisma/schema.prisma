@@ -1,0 +1,449 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  BUYER
+  SELLER
+  ADMIN
+}
+
+enum ListingStatus {
+  PENDING_REVIEW
+  ACTIVE
+  REJECTED
+  SUSPENDED
+  SOLD_OUT
+}
+
+enum OrderStatus {
+  PAYMENT_REVIEW
+  PAYMENT_REJECTED
+  AWAITING_DELIVERY
+  DELIVERED
+  COMPLETED
+  DISPUTED
+  REFUNDED
+  CANCELLED
+}
+
+enum LedgerType {
+  CREDIT
+  DEBIT
+  HOLD
+  RELEASE
+  REFUND
+}
+
+enum OtpChannel {
+  EMAIL
+  SMS
+}
+
+enum OtpPurpose {
+  REGISTRATION
+  LOGIN
+  PASSWORD_RESET
+  HIGH_RISK_ACTION
+}
+
+enum DeliveryStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+enum PaymentProofStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum WithdrawalStatus {
+  PENDING
+  APPROVED
+  PAID
+  REJECTED
+  CANCELLED
+}
+
+enum DisputeStatus {
+  OPEN
+  REVIEWING
+  RESOLVED_BUYER
+  RESOLVED_SELLER
+  CLOSED
+}
+
+enum VariantSelectionMode {
+  NONE
+  PLATFORM
+  LOGIN
+  PLATFORM_LOGIN
+  REGION
+  CUSTOM
+}
+
+enum TradeRiskStatus {
+  NORMAL
+  REVIEW_REQUIRED
+  DISABLED
+}
+
+model User {
+  id                  String         @id @default(cuid())
+  role                UserRole       @default(BUYER)
+  name                String
+  email               String
+  emailNormalized     String         @unique
+  phone               String?
+  phoneNormalized     String?        @unique
+  passwordHash        String
+  primaryVerification OtpChannel?
+  realNameVerified    Boolean        @default(false)
+  phoneVerified       Boolean        @default(false)
+  emailVerified       Boolean        @default(false)
+  banned              Boolean        @default(false)
+  bannedAt            DateTime?
+  riskFlags           Int            @default(0)
+  sellerProfile       SellerProfile?
+  listings            Listing[]      @relation("SellerListings")
+  purchases           Order[]        @relation("BuyerOrders")
+  sales               Order[]        @relation("SellerOrders")
+  walletLedgers       WalletLedger[]
+  withdrawals         Withdrawal[]   @relation("WithdrawalOwner")
+  reviewedWithdrawals Withdrawal[]   @relation("WithdrawalReviewer")
+  otpChallenges       OtpChallenge[]
+  sessions            Session[]
+  reviewsGiven        Review[]       @relation("ReviewsGiven")
+  reviewsReceived     Review[]       @relation("ReviewsReceived")
+  messages            Message[]      @relation("MessageSender")
+  reviewedListings    Listing[]      @relation("ListingReviewer")
+  reviewedProofs      PaymentProof[] @relation("ProofReviewer")
+  resolvedDisputes    Dispute[]      @relation("DisputeResolver")
+  auditLogs           AuditLog[]     @relation("AuditActor")
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  @@index([role, banned])
+  @@index([createdAt])
+}
+
+model SellerProfile {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shopName         String
+  rating           Decimal  @default(0) @db.Decimal(3, 2)
+  completedOrders  Int      @default(0)
+  guaranteeDeposit Decimal  @default(0) @db.Decimal(12, 2)
+  responseMins     Int      @default(0)
+  onTimeRate       Decimal  @default(100) @db.Decimal(5, 2)
+  disputeRate      Decimal  @default(0) @db.Decimal(5, 2)
+  trustGrade       String   @default("B")
+  payoutAccount    String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model GameCategory {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  nameZh    String
+  nameEn    String
+  nameMs    String
+  games     Game[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Game {
+  id               String               @id @default(cuid())
+  categoryId       String
+  category         GameCategory         @relation(fields: [categoryId], references: [id])
+  slug             String               @unique
+  name             String
+  heat             Int                  @default(0)
+  posterUrl        String?
+  posterSource     String?
+  platform         String?
+  loginChannel     String?
+  regionLabel      String?
+  active           Boolean              @default(true)
+  isService        Boolean              @default(false)
+  selectionMode    VariantSelectionMode @default(NONE)
+  shortDescription String?
+  openedAt         DateTime             @default(now())
+  listings         Listing[]
+  variants         GameVariant[]
+  productTypes     GameProductType[]
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+
+  @@index([categoryId, active, heat])
+}
+
+model GameVariant {
+  id                String    @id @default(cuid())
+  gameId            String
+  game              Game      @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  slug              String
+  label             String
+  platform          String?
+  loginChannel      String?
+  regionLabel       String?
+  compatibilityNote String?
+  active            Boolean   @default(true)
+  sortOrder         Int       @default(0)
+  listings          Listing[]
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@unique([gameId, slug])
+  @@index([gameId, active, sortOrder])
+}
+
+model GameProductType {
+  id         String          @id @default(cuid())
+  gameId     String
+  game       Game            @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  code       String
+  labelZh    String
+  labelEn    String
+  labelMs    String
+  riskStatus TradeRiskStatus @default(NORMAL)
+  active     Boolean         @default(true)
+  sortOrder  Int             @default(0)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  @@unique([gameId, code])
+  @@index([gameId, active, sortOrder])
+}
+
+model OtpChallenge {
+  id                String         @id @default(cuid())
+  userId            String
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channel           OtpChannel
+  purpose           OtpPurpose
+  destination       String
+  codeHash          String
+  attempts          Int            @default(0)
+  maxAttempts       Int            @default(5)
+  deliveryStatus    DeliveryStatus @default(PENDING)
+  providerMessageId String?
+  failureReason     String?
+  expiresAt         DateTime
+  resendAvailableAt DateTime
+  verifiedAt        DateTime?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@index([userId, channel, purpose, verifiedAt])
+  @@index([destination, createdAt])
+}
+
+model Session {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash  String    @unique
+  userAgent  String?
+  ipHash     String?
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  lastSeenAt DateTime  @default(now())
+  createdAt  DateTime  @default(now())
+
+  @@index([userId, revokedAt, expiresAt])
+}
+
+model Listing {
+  id                    String          @id @default(cuid())
+  gameId                String
+  game                  Game            @relation(fields: [gameId], references: [id])
+  gameVariantId         String?
+  gameVariant           GameVariant?    @relation(fields: [gameVariantId], references: [id])
+  sellerId              String
+  seller                User            @relation("SellerListings", fields: [sellerId], references: [id])
+  type                  String
+  title                 String
+  description           String
+  price                 Decimal         @db.Decimal(12, 2)
+  stock                 Int             @default(1)
+  deliveryMins          Int             @default(30)
+  status                ListingStatus   @default(PENDING_REVIEW)
+  riskStatus            TradeRiskStatus @default(NORMAL)
+  termsRiskAcknowledged Boolean         @default(false)
+  tags                  String[]
+  reviewNote            String?
+  reviewedById          String?
+  reviewedBy            User?           @relation("ListingReviewer", fields: [reviewedById], references: [id])
+  reviewedAt            DateTime?
+  orders                Order[]
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+
+  @@index([gameId, status, createdAt])
+  @@index([gameVariantId, status, createdAt])
+  @@index([sellerId, status])
+}
+
+model Order {
+  id                String         @id @default(cuid())
+  clientRequestId   String?        @unique
+  listingId         String
+  listing           Listing        @relation(fields: [listingId], references: [id])
+  buyerId           String
+  buyer             User           @relation("BuyerOrders", fields: [buyerId], references: [id])
+  sellerId          String
+  seller            User           @relation("SellerOrders", fields: [sellerId], references: [id])
+  status            OrderStatus    @default(PAYMENT_REVIEW)
+  amount            Decimal        @db.Decimal(12, 2)
+  fee               Decimal        @db.Decimal(12, 2)
+  paymentMethod     String
+  paymentProofs     PaymentProof[]
+  deliverySecret    String?
+  deliveredAt       DateTime?
+  buyerAcceptedAt   DateTime?
+  paymentApprovedAt DateTime?
+  completedAt       DateTime?
+  cancelledAt       DateTime?
+  expiresAt         DateTime?
+  disputes          Dispute[]
+  messages          Message[]
+  review            Review?
+  walletLedgers     WalletLedger[]
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@index([buyerId, status, createdAt])
+  @@index([sellerId, status, createdAt])
+}
+
+model PaymentProof {
+  id           String             @id @default(cuid())
+  orderId      String
+  order        Order              @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  method       String
+  reference    String
+  fileKey      String?
+  fileUrl      String?
+  status       PaymentProofStatus @default(PENDING)
+  note         String?
+  reviewedById String?
+  reviewedBy   User?              @relation("ProofReviewer", fields: [reviewedById], references: [id])
+  reviewedAt   DateTime?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  @@index([orderId, status])
+}
+
+model WalletLedger {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id])
+  orderId   String?
+  order     Order?     @relation(fields: [orderId], references: [id])
+  type      LedgerType
+  amount    Decimal    @db.Decimal(12, 2)
+  note      String
+  createdAt DateTime   @default(now())
+
+  @@index([userId, createdAt])
+  @@index([orderId])
+}
+
+model Withdrawal {
+  id           String           @id @default(cuid())
+  userId       String
+  user         User             @relation("WithdrawalOwner", fields: [userId], references: [id])
+  amount       Decimal          @db.Decimal(12, 2)
+  account      String
+  status       WithdrawalStatus @default(PENDING)
+  note         String?
+  reviewedById String?
+  reviewedBy   User?            @relation("WithdrawalReviewer", fields: [reviewedById], references: [id])
+  reviewedAt   DateTime?
+  paidAt       DateTime?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@index([userId, status])
+}
+
+model Dispute {
+  id           String        @id @default(cuid())
+  orderId      String
+  order        Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  openedById   String
+  reason       String
+  status       DisputeStatus @default(OPEN)
+  note         String?
+  resolvedById String?
+  resolvedBy   User?         @relation("DisputeResolver", fields: [resolvedById], references: [id])
+  resolvedAt   DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([orderId, status])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  senderId  String
+  sender    User     @relation("MessageSender", fields: [senderId], references: [id])
+  body      String
+  riskFlag  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([orderId, createdAt])
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  orderId    String   @unique
+  order      Order    @relation(fields: [orderId], references: [id])
+  reviewerId String
+  reviewer   User     @relation("ReviewsGiven", fields: [reviewerId], references: [id])
+  revieweeId String
+  reviewee   User     @relation("ReviewsReceived", fields: [revieweeId], references: [id])
+  rating     Int
+  body       String?
+  createdAt  DateTime @default(now())
+
+  @@index([revieweeId, createdAt])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actor      User?    @relation("AuditActor", fields: [actorId], references: [id])
+  action     String
+  entityType String
+  entityId   String?
+  ipHash     String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId, createdAt])
+  @@index([actorId, createdAt])
+}
+
+model RateLimitBucket {
+  key       String   @id
+  count     Int      @default(0)
+  resetAt   DateTime
+  updatedAt DateTime @updatedAt
+
+  @@index([resetAt])
+}

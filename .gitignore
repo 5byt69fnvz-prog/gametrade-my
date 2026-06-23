@@ -1,0 +1,16 @@
+dist/
+outputs/
+work/
+.next/
+node_modules/
+.npm-cache/
+.pnpm-store/
+public/assets/
+.env
+.env.local
+.env.production
+!.env.example
+*.log
+.DS_Store
+Thumbs.db
+*.tsbuildinfo

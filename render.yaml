@@ -1,0 +1,64 @@
+services:
+  - type: web
+    name: gametrade-my
+    runtime: node
+    region: singapore
+    plan: starter
+    buildCommand: npm ci && npm run build
+    preDeployCommand: npm run db:migrate && npm run db:seed
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 20.19.0
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: gametrade-my-db
+          property: connectionString
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: OTP_SECRET
+        generateValue: true
+      - key: CRON_SECRET
+        generateValue: true
+      - key: APP_URL
+        sync: false
+      - key: INITIAL_ADMIN_NAME
+        sync: false
+      - key: INITIAL_ADMIN_EMAIL
+        sync: false
+      - key: INITIAL_ADMIN_PHONE
+        sync: false
+      - key: INITIAL_ADMIN_PASSWORD
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: S3_ENDPOINT
+        sync: false
+      - key: S3_REGION
+        value: auto
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_ACCESS_KEY_ID
+        sync: false
+      - key: S3_SECRET_ACCESS_KEY
+        sync: false
+      - key: S3_PUBLIC_BASE_URL
+        sync: false
+      - key: PAYMENT_BANK_NAME
+        sync: false
+      - key: PAYMENT_BANK_ACCOUNT
+        sync: false
+      - key: PAYMENT_DUITNOW_ID
+        sync: false
+
+databases:
+  - name: gametrade-my-db
+    databaseName: gametrade
+    user: gametrade
+    region: singapore
+    plan: basic-256mb

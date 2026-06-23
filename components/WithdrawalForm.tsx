@@ -1,0 +1,7 @@
+"use client";
+
+import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
+import { api } from "@/lib/client-api";
+
+export function WithdrawalForm({balance}:{balance:string}){const router=useRouter();const[busy,setBusy]=useState(false);const[error,setError]=useState("");const[success,setSuccess]=useState("");async function submit(event:FormEvent<HTMLFormElement>){event.preventDefault();setBusy(true);setError("");setSuccess("");const body=Object.fromEntries(new FormData(event.currentTarget));try{await api("/api/withdrawals",{method:"POST",body:JSON.stringify(body)});setSuccess("提款申请已提交，金额已暂时冻结等待管理员处理。");event.currentTarget.reset();router.refresh();}catch(cause){setError(cause instanceof Error?cause.message:"申请失败");}finally{setBusy(false)}}return <form className="panel form-grid" onSubmit={submit}><div className="field wide"><h3>申请提款</h3><p className="muted">可用余额 RM {balance}</p></div><div className="field"><label>提款金额 (RM)</label><input className="input" name="amount" type="number" min="0.01" max={balance} step="0.01" required/></div><div className="field"><label>银行 / DuitNow 账户</label><input className="input" name="account" required minLength={6} placeholder="Maybank · 账户姓名 · 账号"/></div>{error&&<p className="form-error field wide">{error}</p>}{success&&<p className="form-success field wide">{success}</p>}<div className="field wide"><button className="button gold" disabled={busy||Number(balance)<=0}>{busy?"提交中...":"提交提款申请"}</button></div></form>}

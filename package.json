@@ -1,0 +1,43 @@
+{
+  "name": "gametrade-my",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production Malaysia-first C2C game virtual goods marketplace.",
+  "scripts": {
+    "dev": "node scripts/sync-public-assets.js && next dev -p 4173",
+    "build": "node scripts/sync-public-assets.js && prisma generate && next build",
+    "start": "next start",
+    "test": "tsx --test tests/**/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "db:seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.1073.0",
+    "@aws-sdk/s3-request-presigner": "3.1073.0",
+    "@prisma/client": "6.19.3",
+    "next": "16.2.9",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "prisma": "6.19.3",
+    "server-only": "^0.0.1",
+    "tsx": "^4.21.0",
+    "typescript": "6.0.3"
+  },
+  "engines": {
+    "node": ">=20.9"
+  },
+  "overrides": {
+    "postcss": "8.5.10"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  }
+}
