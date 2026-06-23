@@ -8,7 +8,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
     const { id } = await context.params;
     const listing = await db.listing.findFirst({
       where: { id, status: "ACTIVE" },
-      include: { game: { include: { category: true } }, seller: { select: publicUserSelect } }
+      include: { game: { include: { category: true } }, images: { where: { status: "APPROVED" }, orderBy: { sortOrder: "asc" } }, seller: { select: publicUserSelect } }
     });
     if (!listing) throw new Error("NOT_FOUND");
     return jsonOk(serialize(listing));

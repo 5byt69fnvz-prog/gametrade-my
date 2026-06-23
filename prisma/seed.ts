@@ -60,6 +60,15 @@ const platformLoginVariants: VariantSeed[] = [
   { slug: "android-qq", label: "Android · QQ区", platform: "Android", loginChannel: "QQ", regionLabel: "中国区", compatibilityNote: "仅适用于 Android QQ区，不能转移至微信或 iOS 区。" }
 ];
 
+const honorOfKingsVariants: VariantSeed[] = [
+  { slug: "china-ios-wechat", label: "中国版 · iOS 微信区", platform: "iOS", loginChannel: "微信", regionLabel: "中国版", compatibilityNote: "仅适用于王者荣耀中国版 iOS 微信区，不能转移到 QQ、Android 或国际版。" },
+  { slug: "china-ios-qq", label: "中国版 · iOS QQ区", platform: "iOS", loginChannel: "QQ", regionLabel: "中国版", compatibilityNote: "仅适用于王者荣耀中国版 iOS QQ区，不能转移到微信、Android 或国际版。" },
+  { slug: "china-android-wechat", label: "中国版 · Android 微信区", platform: "Android", loginChannel: "微信", regionLabel: "中国版", compatibilityNote: "仅适用于王者荣耀中国版 Android 微信区，不能转移到 QQ、iOS 或国际版。" },
+  { slug: "china-android-qq", label: "中国版 · Android QQ区", platform: "Android", loginChannel: "QQ", regionLabel: "中国版", compatibilityNote: "仅适用于王者荣耀中国版 Android QQ区，不能转移到微信、iOS 或国际版。" },
+  { slug: "international-ios", label: "国际版 · iOS Global", platform: "iOS", regionLabel: "国际版", compatibilityNote: "适用于 Honor of Kings 国际版 iOS 账号，不使用微信/QQ 中国区登录渠道。" },
+  { slug: "international-android", label: "国际版 · Android Global", platform: "Android", regionLabel: "国际版", compatibilityNote: "适用于 Honor of Kings 国际版 Android 账号，不使用微信/QQ 中国区登录渠道。" }
+];
+
 const games: GameSeed[] = [
   { slug: "mobile-legends", name: "Mobile Legends: Bang Bang", category: "mobile-games", poster: "mobile-legends-ai.jpg", platform: "iOS / Android", loginChannel: "Moonton", region: "Malaysia", heat: 68240, description: "马来西亚热门 MOBA 市场，支持账号、钻石代储与陪练服务。", productCodes: ["ACCOUNT", "TOPUP", "BOOSTING", "REQUEST"] },
   { slug: "pubg-mobile", name: "PUBG Mobile", category: "mobile-games", poster: "pubg-mobile-ai.jpg", platform: "iOS / Android", loginChannel: "Level Infinite", region: "SEA / Global", heat: 42110, description: "账号、UC 代储、套装与陪练市场。", selectionMode: VariantSelectionMode.REGION, variants: regionVariants(["SEA", "Global", "KR / JP"]), productCodes: ["ACCOUNT", "TOPUP", "ITEM", "BOOSTING"] },
@@ -70,7 +79,7 @@ const games: GameSeed[] = [
   { slug: "tears-of-themis", name: "未定事件簿 Tears of Themis", category: "mobile-games", poster: "tears-of-themis-ai.jpg", platform: "iOS / Android", loginChannel: "HoYoverse", region: "Global", heat: 22840, description: "律师账号、晶片代储与活动代肝服务。", selectionMode: VariantSelectionMode.REGION, variants: regionVariants(["Global", "TW / HK / MO"]), productCodes: ["ACCOUNT", "TOPUP", "BOOSTING"] },
   { slug: "honkai-gakuen-2", name: "崩坏学园2", category: "mobile-games", poster: "honkai-gakuen-2-ai.jpg", platform: "iOS / Android", loginChannel: "miHoYo", region: "China", heat: 16420, description: "中国区账号与活动代肝专区。", selectionMode: VariantSelectionMode.REGION, variants: regionVariants(["China"]), productCodes: ["ACCOUNT", "BOOSTING"] },
   { slug: "wuthering-waves", name: "鸣潮 Wuthering Waves", category: "mobile-games", poster: "wuthering-waves-ai.jpg", platform: "iOS / Android / PC", loginChannel: "Kuro Games", region: "Global", heat: 57940, description: "漂泊者账号、月相代储与声骸养成服务。", selectionMode: VariantSelectionMode.REGION, variants: regionVariants(["Southeast Asia", "Asia", "HMT", "America", "Europe"]), productCodes: ["ACCOUNT", "TOPUP", "BOOSTING"] },
-  { slug: "honor-of-kings", name: "王者荣耀 Honor of Kings", category: "mobile-games", poster: "honor-of-kings-ai.jpg", platform: "iOS / Android", loginChannel: "微信 / QQ", region: "中国区", heat: 82400, description: "进入市场后选择手机平台与登录渠道，避免买错区服。", selectionMode: VariantSelectionMode.PLATFORM_LOGIN, variants: platformLoginVariants, productCodes: ["ACCOUNT", "TOPUP", "BOOSTING", "GIFT"] },
+  { slug: "honor-of-kings", name: "王者荣耀 Honor of Kings", category: "mobile-games", poster: "honor-of-kings-ai.jpg", platform: "iOS / Android", loginChannel: "微信 / QQ / Global", region: "中国版 / 国际版", heat: 82400, description: "先选择中国版或国际版，再选择平台与登录渠道，避免买错版本和区服。", selectionMode: VariantSelectionMode.PLATFORM_LOGIN, variants: honorOfKingsVariants, productCodes: ["ACCOUNT", "TOPUP", "BOOSTING", "GIFT"] },
   { slug: "peace-elite", name: "和平精英 Peace Elite", category: "mobile-games", poster: "peace-elite-ai.jpg", platform: "iOS / Android", loginChannel: "微信 / QQ", region: "中国区", heat: 71100, description: "按 iOS、Android、微信与 QQ 精确筛选账号和点券服务。", selectionMode: VariantSelectionMode.PLATFORM_LOGIN, variants: platformLoginVariants, productCodes: ["ACCOUNT", "TOPUP", "ITEM", "BOOSTING"] },
   { slug: "valorant-mobile", name: "无畏契约：源能行动（手游）", category: "mobile-games", poster: "valorant-mobile-ai.jpg", platform: "iOS / Android", loginChannel: "腾讯 / Riot", region: "中国区", heat: 64800, description: "手游账号、点券与陪练市场。", selectionMode: VariantSelectionMode.PLATFORM, variants: [{ slug: "ios", label: "iOS", platform: "iOS" }, { slug: "android", label: "Android", platform: "Android" }], productCodes: ["ACCOUNT", "TOPUP", "BOOSTING"] },
   { slug: "free-fire", name: "Free Fire", category: "mobile-games", poster: "free-fire-ai.jpg", platform: "iOS / Android", loginChannel: "Garena", region: "SEA", heat: 61420, description: "Garena 账号、钻石代储与游戏道具市场。", productCodes: ["ACCOUNT", "TOPUP", "ITEM", "BOOSTING"] },
@@ -112,19 +121,26 @@ const productTypes = {
 } as const;
 
 const legacyVariants = [
-  ["honor-kings-ios-wechat", "honor-of-kings", "ios-wechat"],
-  ["honor-kings-ios-qq", "honor-of-kings", "ios-qq"],
-  ["honor-kings-android-wechat", "honor-of-kings", "android-wechat"],
-  ["honor-kings-android-qq", "honor-of-kings", "android-qq"],
+  ["honor-kings-ios-wechat", "honor-of-kings", "china-ios-wechat"],
+  ["honor-kings-ios-qq", "honor-of-kings", "china-ios-qq"],
+  ["honor-kings-android-wechat", "honor-of-kings", "china-android-wechat"],
+  ["honor-kings-android-qq", "honor-of-kings", "china-android-qq"],
   ["peace-elite-ios-wechat", "peace-elite", "ios-wechat"],
   ["peace-elite-ios-qq", "peace-elite", "ios-qq"],
   ["peace-elite-android-wechat", "peace-elite", "android-wechat"],
   ["peace-elite-android-qq", "peace-elite", "android-qq"]
 ] as const;
 
+const variantAliases = [
+  ["honor-of-kings", "ios-wechat", "china-ios-wechat"],
+  ["honor-of-kings", "ios-qq", "china-ios-qq"],
+  ["honor-of-kings", "android-wechat", "china-android-wechat"],
+  ["honor-of-kings", "android-qq", "china-android-qq"]
+] as const;
+
 const demoListings = [
-  { game: "honor-of-kings", variant: "ios-wechat", type: "ACCOUNT", title: "荣耀典藏皮肤账号 · iOS 微信区", description: "已完成资料核对，包含多款限定皮肤。交付前会在订单房再次确认区服，账号类商品由管理员人工审核。", price: 288, stock: 1, deliveryMins: 25, tags: ["iOS", "微信区", "人工审核"] },
-  { game: "honor-of-kings", variant: "android-qq", type: "TOPUP", title: "王者点券代储 · Android QQ区", description: "下单后提供游戏角色资料，卖家在平台确认付款后开始代储。", price: 42, stock: 20, deliveryMins: 15, tags: ["Android", "QQ区", "快速交付"] },
+  { game: "honor-of-kings", variant: "china-ios-wechat", type: "ACCOUNT", title: "荣耀典藏皮肤账号 · iOS 微信区", description: "已完成资料核对，包含多款限定皮肤。交付前会在订单房再次确认区服，账号类商品由管理员人工审核。", price: 288, stock: 1, deliveryMins: 25, tags: ["iOS", "微信区", "人工审核"] },
+  { game: "honor-of-kings", variant: "china-android-qq", type: "TOPUP", title: "王者点券代储 · Android QQ区", description: "下单后提供游戏角色资料，卖家在平台确认付款后开始代储。", price: 42, stock: 20, deliveryMins: 15, tags: ["Android", "QQ区", "快速交付"] },
   { game: "peace-elite", variant: "ios-wechat", type: "ACCOUNT", title: "和平精英收藏账号 · iOS 微信区", description: "展示资料与库存已提交平台审核，购买前请确认 iOS 微信区兼容。", price: 368, stock: 1, deliveryMins: 30, tags: ["iOS", "微信区", "收藏账号"] },
   { game: "genshin-impact", variant: "asia", type: "TOPUP", title: "原神创世结晶代储 · 亚洲服", description: "亚洲服务器快速代储，不索取密码。订单内核对 UID 与服务器。", price: 35.9, stock: 50, deliveryMins: 10, tags: ["亚洲服", "无需密码", "热卖"] },
   { game: "genshin-impact", variant: "asia", type: "ACCOUNT", title: "原神成品账号 · 亚洲服", description: "角色与武器资料已截图留证，交付后请立即完成安全资料变更。", price: 258, stock: 1, deliveryMins: 25, tags: ["亚洲服", "成品账号", "人工审核"] },
@@ -273,6 +289,20 @@ async function main() {
     ]);
   }
 
+  for (const [gameSlug, oldVariantSlug, newVariantSlug] of variantAliases) {
+    const game = await prisma.game.findUnique({ where: { slug: gameSlug } });
+    if (!game) continue;
+    const [oldVariant, newVariant] = await Promise.all([
+      prisma.gameVariant.findUnique({ where: { gameId_slug: { gameId: game.id, slug: oldVariantSlug } } }),
+      prisma.gameVariant.findUnique({ where: { gameId_slug: { gameId: game.id, slug: newVariantSlug } } })
+    ]);
+    if (!oldVariant || !newVariant) continue;
+    await prisma.$transaction([
+      prisma.listing.updateMany({ where: { gameId: game.id, gameVariantId: oldVariant.id }, data: { gameVariantId: newVariant.id } }),
+      prisma.gameVariant.update({ where: { id: oldVariant.id }, data: { active: false } })
+    ]);
+  }
+
   await prisma.game.updateMany({ where: { slug: "minecraft" }, data: { active: false } });
 
   const email = process.env.INITIAL_ADMIN_EMAIL;
@@ -303,3 +333,4 @@ async function main() {
 }
 
 main().finally(() => prisma.$disconnect());
+

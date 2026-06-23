@@ -10,7 +10,7 @@ export default async function AdminPage() {
   const since30d = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   const [users, listings, proofs, withdrawals, disputes, riskyMessages, largeOrders, refunds, sessions] = await Promise.all([
     db.user.findMany({ select: { id: true, role: true, name: true, email: true, phone: true, emailVerified: true, phoneVerified: true, primaryVerification: true, banned: true, riskFlags: true, createdAt: true, _count: { select: { purchases: true, sales: true, listings: true, otpChallenges: true } } }, orderBy: { createdAt: "desc" }, take: 500 }),
-    db.listing.findMany({ include: { game: true, gameVariant: true, seller: { select: { id: true, name: true } } }, orderBy: { createdAt: "desc" }, take: 200 }),
+    db.listing.findMany({ include: { game: true, gameVariant: true, images: { orderBy: { sortOrder: "asc" } }, seller: { select: { id: true, name: true } } }, orderBy: { createdAt: "desc" }, take: 200 }),
     db.paymentProof.findMany({ include: { order: { include: { listing: { include: { game: true } }, buyer: { select: { id: true, name: true } } } } }, orderBy: { createdAt: "desc" }, take: 200 }),
     db.withdrawal.findMany({ include: { user: { select: { id: true, name: true, email: true, phone: true } } }, orderBy: { createdAt: "desc" }, take: 200 }),
     db.dispute.findMany({ include: { order: { include: { listing: { include: { game: true } }, buyer: { select: { id: true, name: true } }, seller: { select: { id: true, name: true } } } } }, orderBy: { createdAt: "desc" }, take: 200 }),

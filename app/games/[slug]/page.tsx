@@ -3,8 +3,8 @@ import { db } from "@/lib/db";
 import { GameMarket } from "@/components/GameMarket";
 
 const legacyRedirects: Record<string, [string, string]> = {
-  "honor-kings-ios-wechat": ["honor-of-kings", "ios-wechat"], "honor-kings-ios-qq": ["honor-of-kings", "ios-qq"],
-  "honor-kings-android-wechat": ["honor-of-kings", "android-wechat"], "honor-kings-android-qq": ["honor-of-kings", "android-qq"],
+  "honor-kings-ios-wechat": ["honor-of-kings", "china-ios-wechat"], "honor-kings-ios-qq": ["honor-of-kings", "china-ios-qq"],
+  "honor-kings-android-wechat": ["honor-of-kings", "china-android-wechat"], "honor-kings-android-qq": ["honor-of-kings", "china-android-qq"],
   "peace-elite-ios-wechat": ["peace-elite", "ios-wechat"], "peace-elite-ios-qq": ["peace-elite", "ios-qq"],
   "peace-elite-android-wechat": ["peace-elite", "android-wechat"], "peace-elite-android-qq": ["peace-elite", "android-qq"]
 };

@@ -21,6 +21,12 @@ enum ListingStatus {
   SOLD_OUT
 }
 
+enum ListingImageStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 enum OrderStatus {
   PAYMENT_REVIEW
   PAYMENT_REJECTED
@@ -113,6 +119,7 @@ model User {
   riskFlags           Int            @default(0)
   sellerProfile       SellerProfile?
   listings            Listing[]      @relation("SellerListings")
+  listingImages       ListingImage[] @relation("ListingImageUploader")
   purchases           Order[]        @relation("BuyerOrders")
   sales               Order[]        @relation("SellerOrders")
   walletLedgers       WalletLedger[]
@@ -286,6 +293,7 @@ model Listing {
   reviewedById          String?
   reviewedBy            User?           @relation("ListingReviewer", fields: [reviewedById], references: [id])
   reviewedAt            DateTime?
+  images                ListingImage[]
   orders                Order[]
   createdAt             DateTime        @default(now())
   updatedAt             DateTime        @updatedAt
@@ -293,6 +301,25 @@ model Listing {
   @@index([gameId, status, createdAt])
   @@index([gameVariantId, status, createdAt])
   @@index([sellerId, status])
+}
+
+model ListingImage {
+  id          String             @id @default(cuid())
+  listingId   String
+  listing     Listing            @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  uploaderId  String
+  uploader    User               @relation("ListingImageUploader", fields: [uploaderId], references: [id])
+  fileKey     String
+  fileUrl     String?
+  contentType String
+  altText     String?
+  sortOrder   Int                @default(0)
+  status      ListingImageStatus @default(PENDING)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@index([listingId, status, sortOrder])
+  @@index([uploaderId, createdAt])
 }
 
 model Order {

@@ -7,7 +7,7 @@ function client() {
   const endpoint = process.env.S3_ENDPOINT;
   const accessKeyId = process.env.S3_ACCESS_KEY_ID;
   const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY;
-  if (!endpoint || !accessKeyId || !secretAccessKey) throw new Error("Object storage is not configured");
+  if (!endpoint || !accessKeyId || !secretAccessKey || endpoint.includes("example.invalid")) throw new Error("STORAGE_NOT_CONFIGURED");
   return new S3Client({
     endpoint,
     region: process.env.S3_REGION || "auto",
@@ -19,15 +19,33 @@ function client() {
 export async function createPaymentProofUpload(userId: string, contentType: string) {
   if (!new Set(["image/jpeg", "image/png", "image/webp", "application/pdf"]).has(contentType)) throw new Error("UNSUPPORTED_FILE_TYPE");
   const bucket = process.env.S3_BUCKET;
-  if (!bucket) throw new Error("S3_BUCKET is not configured");
+  if (!bucket) throw new Error("STORAGE_NOT_CONFIGURED");
   const extension = contentType === "application/pdf" ? "pdf" : contentType.split("/")[1];
   const key = `payment-proofs/${userId}/${randomUUID()}.${extension}`;
   const command = new PutObjectCommand({ Bucket: bucket, Key: key, ContentType: contentType });
   return { fileKey: key, uploadUrl: await getSignedUrl(client(), command, { expiresIn: 300 }) };
 }
 
+export async function createListingImageUpload(userId: string, contentType: string) {
+  if (!new Set(["image/jpeg", "image/png", "image/webp"]).has(contentType)) throw new Error("UNSUPPORTED_FILE_TYPE");
+  const bucket = process.env.S3_BUCKET;
+  if (!bucket) throw new Error("STORAGE_NOT_CONFIGURED");
+  const extension = contentType.split("/")[1];
+  const key = `listing-images/${userId}/${randomUUID()}.${extension}`;
+  const command = new PutObjectCommand({ Bucket: bucket, Key: key, ContentType: contentType });
+  const publicBase = process.env.S3_PUBLIC_BASE_URL?.replace(/\/$/, "");
+  const fileUrl = publicBase && !publicBase.includes("example.invalid") ? `${publicBase}/${key}` : undefined;
+  return { fileKey: key, fileUrl, uploadUrl: await getSignedUrl(client(), command, { expiresIn: 300 }) };
+}
+
+export function publicUrlForStorageKey(fileKey: string) {
+  const publicBase = process.env.S3_PUBLIC_BASE_URL?.replace(/\/$/, "");
+  if (!publicBase || publicBase.includes("example.invalid")) return null;
+  return `${publicBase}/${fileKey}`;
+}
+
 export async function createPrivateDownload(fileKey: string) {
   const bucket = process.env.S3_BUCKET;
-  if (!bucket) throw new Error("S3_BUCKET is not configured");
+  if (!bucket) throw new Error("STORAGE_NOT_CONFIGURED");
   return getSignedUrl(client(), new GetObjectCommand({ Bucket: bucket, Key: fileKey }), { expiresIn: 120 });
 }

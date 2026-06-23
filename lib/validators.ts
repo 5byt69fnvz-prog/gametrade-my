@@ -14,6 +14,13 @@ export const loginSchema = z.object({ loginId: z.string().trim().min(3).max(254)
 export const otpSendSchema = z.object({ channel: z.literal("EMAIL"), purpose: z.enum(["REGISTRATION", "LOGIN", "PASSWORD_RESET", "HIGH_RISK_ACTION"]).default("REGISTRATION") });
 export const otpVerifySchema = otpSendSchema.extend({ code: z.string().regex(/^\d{6}$/) });
 
+const listingImageInputSchema = z.object({
+  fileKey: z.string().trim().min(10).max(500),
+  fileUrl: z.url().max(2000).optional().or(z.literal("")),
+  contentType: z.enum(["image/jpeg", "image/png", "image/webp"]),
+  altText: z.string().trim().max(120).optional().or(z.literal(""))
+});
+
 export const listingCreateSchema = z.object({
   gameId: z.string().min(1),
   gameVariantId: z.string().min(1).optional().or(z.literal("")),
@@ -24,6 +31,7 @@ export const listingCreateSchema = z.object({
   stock: z.coerce.number().int().min(1).max(10000),
   deliveryMins: z.coerce.number().int().min(1).max(10080),
   tags: z.array(z.string().trim().min(1).max(30)).max(12).default([]),
+  images: z.array(listingImageInputSchema).max(6).default([]),
   shopName: z.string().trim().min(2).max(80).optional().or(z.literal("")),
   termsRiskAcknowledged: z.coerce.boolean().default(false)
 });
@@ -35,6 +43,10 @@ export const orderCreateSchema = z.object({
 });
 
 export const uploadSchema = z.object({ contentType: z.enum(["image/jpeg", "image/png", "image/webp", "application/pdf"]) });
+export const listingImageUploadSchema = z.object({
+  contentType: z.enum(["image/jpeg", "image/png", "image/webp"]),
+  contentLength: z.number().int().positive().max(8 * 1024 * 1024)
+});
 export const proofSchema = z.object({ reference: z.string().trim().min(3).max(120), method: z.string().trim().min(2).max(40), fileKey: z.string().max(500).optional(), fileUrl: z.url().max(2000).optional() });
 export const orderActionSchema = z.object({ action: z.enum(["DELIVER", "ACCEPT", "DISPUTE", "CANCEL"]), deliverySecret: z.string().max(5000).optional(), reason: z.string().trim().min(10).max(2000).optional() });
 export const withdrawalSchema = z.object({ amount: z.coerce.number().positive().max(100000), account: z.string().trim().min(6).max(500) });
